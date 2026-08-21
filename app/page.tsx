@@ -31,28 +31,28 @@ export default function Home() {
   return (
     <>
 
-      {/* HERO */}
-      <section className="bg-indigo text-white py-24">
-        <div className="max-w-[1120px] mx-auto px-8">
-          <div className="font-mono text-[13px] tracking-wide uppercase text-gold-2 mb-5">
-            CANEL-LCBK · Lycée Collège la Bénédiction de Kyabé · Depuis 2009
-          </div>
-          <h1 className="font-serif text-5xl md:text-6xl leading-tight max-w-[680px] mb-6">
-            Une chaîne qui <em className="text-gold-2 not-italic italic">continue</em>.
-          </h1>
-          <p className="text-lg leading-relaxed max-w-[520px] text-[#D9D4C4] mb-9">
-            Chaque promotion est un maillon. CANEL-LCBK relie les anciens élèves d&apos;hier à ceux d&apos;aujourd&apos;hui — pour le partage intellectuel, le brassage et la connaissance entre tous les ressortissants de notre établissement.
-          </p>
-          <div className="flex gap-3.5">
-            <a href=" /annuaire" className="bg-gold-2 text-indigo font-semibold text-[15px] px-6.5 py-3.5 rounded-sm">
-              Rejoindre l&apos;annuaire
-            </a>
-            <a href="#piliers" className="border border-white/30 text-white font-medium text-[15px] px-6.5 py-3.5 rounded-sm">
-              Découvrir le projet
-            </a>
-          </div>
-        </div>
-      </section>
+      {{/* HERO */}
+<section className="bg-indigo text-white py-16 md:py-24">
+  <div className="max-w-[1120px] mx-auto px-5 md:px-8">
+    <div className="font-mono text-[11px] md:text-[13px] tracking-wide uppercase text-gold-2 mb-4">
+      CANEL-LCBK · Lycée Collège la Bénédiction de Kyabé · Depuis 2009
+    </div>
+    <h1 className="font-serif text-[38px] md:text-6xl leading-tight max-w-[680px] mb-5">
+      Une chaîne qui <em className="text-gold-2 not-italic italic">continue</em>.
+    </h1>
+    <p className="text-[15px] md:text-lg leading-relaxed max-w-[520px] text-[#D9D4C4] mb-8">
+      Chaque promotion est un maillon. CANEL-LCBK relie les anciens élèves d&apos;hier à ceux d&apos;aujourd&apos;hui — pour le partage intellectuel, le brassage et la connaissance entre tous les ressortissants de notre établissement.
+    </p>
+    <div className="flex flex-col sm:flex-row gap-3">
+      <a href="/annuaire" className="bg-gold-2 text-indigo font-semibold text-[15px] px-6 py-3.5 rounded-sm text-center">
+        Rejoindre l&apos;annuaire
+      </a>
+      <a href="#piliers" className="border border-white/30 text-white font-medium text-[15px] px-6 py-3.5 rounded-sm text-center">
+        Découvrir le projet
+      </a>
+    </div>
+  </div>
+</section>
 
       {/* STATS */}
       <div className="bg-sand-2 border-b border-[#E3D9BC] py-7">
