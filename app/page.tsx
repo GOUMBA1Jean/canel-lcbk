@@ -31,7 +31,6 @@ export default function Home() {
   return (
     <>
 
-      {{/* HERO */}
 <section className="bg-indigo text-white py-16 md:py-24">
   <div className="max-w-[1120px] mx-auto px-5 md:px-8">
     <div className="font-mono text-[11px] md:text-[13px] tracking-wide uppercase text-gold-2 mb-4">
