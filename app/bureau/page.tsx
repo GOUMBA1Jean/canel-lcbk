@@ -20,32 +20,32 @@ const MIcon = () => (
 export default function Bureau() {
   return (
     <>
-      <section className="bg-indigo text-white py-16">
+      <section className="bg-[#1E5A8E] text-white py-16">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-          <div className="font-mono text-[13px] tracking-wide uppercase text-gold-2 mb-4">CANEL-LCBK</div>
+          <div className="font-mono text-[13px] tracking-wide uppercase text-[#A8CBE8] mb-4">CANEL-LCBK</div>
           <h1 className="font-serif text-4xl md:text-5xl mb-4">Le bureau</h1>
-          <p className="text-[#D9D4C4] max-w-[560px] leading-relaxed">
+          <p className="text-[#D0E4F2] max-w-[560px] leading-relaxed">
             Les responsables qui coordonnent CANEL-LCBK, en ligne et en présentiel à Kyabé.
           </p>
         </div>
       </section>
 
-      <section className="py-14">
+      <section className="py-14 bg-[#FAFAF8]">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#E3D9BC] border border-[#E3D9BC] mb-14">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#D5C9B8] border border-[#D5C9B8] mb-14">
             {bureau.map((m) => (
-              <div key={m.nom} className="bg-sand p-6 flex flex-col gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo text-gold-2 flex items-center justify-center font-serif text-xl">
+              <div key={m.nom} className="bg-[#FAFAF8] p-6 flex flex-col gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#1E5A8E] text-[#A8CBE8] flex items-center justify-center font-serif text-xl">
                   {m.nom.charAt(0)}
                 </div>
                 <div>
-                  <h4 className="text-[16px] font-semibold text-indigo mb-1">{m.nom}</h4>
-                  <p className="text-[13px] text-[#6b6a63] mb-4">{m.role}</p>
+                  <h4 className="text-[16px] font-semibold text-[#1E5A8E] mb-1">{m.nom}</h4>
+                  <p className="text-[13px] text-[#6B6B6B] mb-4">{m.role}</p>
                   <div className="flex flex-col gap-2">
                     <a href={"https://wa.me/" + m.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#25D366] text-white text-[13px] font-medium px-4 py-2 rounded-sm w-fit">
                       <WIcon /> WhatsApp
                     </a>
-                    <a href={"mailto:" + m.mail} className="inline-flex items-center gap-2 border border-indigo text-indigo text-[13px] font-medium px-4 py-2 rounded-sm w-fit">
+                    <a href={"mailto:" + m.mail} className="inline-flex items-center gap-2 border border-[#1E5A8E] text-[#1E5A8E] text-[13px] font-medium px-4 py-2 rounded-sm w-fit">
                       <MIcon /> Email
                     </a>
                   </div>
@@ -54,12 +54,12 @@ export default function Bureau() {
             ))}
           </div>
 
-          <div className="bg-sand-2 border border-[#E3D9BC] rounded p-8 max-w-xl">
-            <h3 className="font-serif text-xl text-indigo mb-3">Rejoindre CANEL-LCBK</h3>
-            <p className="text-[13.5px] text-[#54534c] mb-5">
-              Rejoignez le groupe WhatsApp pour suivre les actualités, participer aux échanges et contribuer à la vie de CANEL-LCBK.
+          <div className="bg-[#F0EAE0] border border-[#D5C9B8] rounded p-8 max-w-xl">
+            <h3 className="font-serif text-xl text-[#1E5A8E] mb-3">Rejoindre CANEL-LCBK</h3>
+            <p className="text-[13.5px] text-[#6B6B6B] mb-5">
+              Rejoignez le groupe WhatsApp pour suivre les actualités et contribuer à la vie de CANEL-LCBK.
             </p>
-            <a href="https://chat.whatsapp.com/JuQvIvpnfdcH06e62u1zsc?s=cl&amp;p=a&amp;ilr=1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#25D366] text-white font-semibold text-[15px] px-6 py-3.5 rounded-sm">
+            <a href="https://chat.whatsapp.com/JuQvIvpnfdcH06e62u1zsc?s=cl&p=a&ilr=1" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-[#25D366] text-white font-semibold text-[15px] px-6 py-3.5 rounded-sm">
               <WIcon /> Rejoindre le groupe CANEL-LCBK
             </a>
           </div>
