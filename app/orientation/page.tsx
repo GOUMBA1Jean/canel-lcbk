@@ -20,17 +20,19 @@ export default function Orientation() {
 
   return (
     <>
-      <section className="bg-indigo text-white py-16">
-        <div className="max-w-[1120px] mx-auto px-8">
-          <div className="font-mono text-[13px] tracking-wide uppercase text-gold-2 mb-4">
-            Pour les nouveaux bacheliers
-          </div>
-          <h1 className="font-serif text-4xl md:text-5xl mb-4">Choisir sa voie, avec l&apos;appui des anciens</h1>
-          <p className="text-[#D9D4C4] max-w-[560px] leading-relaxed">
-            Avant de s&apos;engager dans une filière, lisez le parcours d&apos;un ancien qui est passé par là — ou posez-lui directement une question.
-          </p>
-        </div>
-      </section>
+     <section className="bg-[#1E5A8E] text-white py-16">
+  <div className="max-w-[1120px] mx-auto px-5 md:px-8">
+    <div className="font-mono text-[13px] tracking-wide uppercase text-[#A8CBE8] mb-4">
+      Pour les nouveaux bacheliers
+    </div>
+    <h1 className="font-serif text-4xl md:text-5xl mb-4">
+      Choisir sa voie, avec l&apos;appui des anciens
+    </h1>
+    <p className="text-[#D0E4F2] max-w-[560px] leading-relaxed">
+      Avant de s&apos;engager dans une filière, lisez le parcours d&apos;un ancien qui est passé par là — ou posez votre question directement au bureau de CANEL-LCBK.
+    </p>
+  </div>
+</section>
 
       <section className="py-14">
         <div className="max-w-[1120px] mx-auto px-8">
