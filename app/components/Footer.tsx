@@ -19,7 +19,7 @@ export default function Footer() {
   <h3 className="font-semibold">Nous suivre</h3>
 
   <a
-    href="TON_LIEN_FACEBOOK"
+    href="https://www.facebook.com/profile.php?id=100090022194547"
     target="_blank"
     rel="noopener noreferrer"
     className="flex items-center gap-2 hover:opacity-80 transition"
@@ -37,7 +37,7 @@ export default function Footer() {
   </a>
 
   <a
-    href="TON_LIEN_WHATSAPP"
+    href="https://chat.whatsapp.com/JuQvIvpnfdcH06e62u1zsc?s=cl&p=a&ilr=1"
     target="_blank"
     rel="noopener noreferrer"
     className="flex items-center gap-2 hover:opacity-80 transition"
