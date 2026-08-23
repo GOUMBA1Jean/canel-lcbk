@@ -33,7 +33,7 @@ export default function Annuaire() {
 
   async function chargerAnciens() {
     setChargement(true);
-    const { data } = await supabase.from("anciens").select("*").order("promotion", { ascending: false });
+    const { data } = await supabase.from("anciens").select("*").eq("statut", "validé").order("promotion", { ascending: false });
     setAnciens(data || []);
     setChargement(false);
   }
