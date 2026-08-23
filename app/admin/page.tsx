@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
-const MOT_DE_PASSE = "canel2026@bureauexec";
+const MOT_DE_PASSE = "canel2026@admin";
 
 type Ancien = { id: string; prenom: string; nom: string; promotion: string; filiere: string; secteur: string; ville: string; statut: string; photo_url: string | null; };
 type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; statut: string; };
@@ -12,8 +12,8 @@ type Offre = { id: string; titre: string; type: string; lieu: string; auteur: st
 export default function Admin() {
   const [connecte, setConnecte] = useState(false);
   const [mdp, setMdp] = useState("");
-  const [erreurMdp, setErreurMdp] = useState(false);
   const [voirMdp, setVoirMdp] = useState(false);
+  const [erreurMdp, setErreurMdp] = useState(false);
   const [onglet, setOnglet] = useState<"annuaire" | "actualites" | "offres">("annuaire");
   const [anciens, setAnciens] = useState<Ancien[]>([]);
   const [actus, setActus] = useState<Actu[]>([]);
@@ -26,9 +26,7 @@ export default function Admin() {
     else { setErreurMdp(true); }
   }
 
-  useEffect(() => {
-    if (connecte) { chargerTout(); }
-  }, [connecte]);
+  useEffect(() => { if (connecte) chargerTout(); }, [connecte]);
 
   async function chargerTout() {
     setChargement(true);
@@ -60,30 +58,16 @@ export default function Admin() {
   }
 
   function Badge({ statut }: { statut: string }) {
-    const styles: Record<string, string> = {
-      "en_attente": "bg-yellow-100 text-yellow-800",
-      "validé": "bg-green-100 text-green-800",
-      "rejeté": "bg-red-100 text-red-800",
-    };
-    return <span className={"font-mono text-[11px] px-2 py-1 rounded-sm " + (styles[statut] || "bg-gray-100 text-gray-800")}>{statut}</span>;
+    const s: Record<string, string> = { "en_attente": "bg-yellow-100 text-yellow-800", "validé": "bg-green-100 text-green-800", "rejeté": "bg-red-100 text-red-800" };
+    return <span className={"font-mono text-[11px] px-2 py-1 rounded-sm " + (s[statut] || "bg-gray-100 text-gray-800")}>{statut}</span>;
   }
 
   function Actions({ table, item }: { table: string; item: { id: string; statut: string } }) {
     return (
       <div className="flex gap-2 flex-wrap mt-3">
-        {item.statut !== "validé" && (
-          <button onClick={() => valider(table, item.id)} className="bg-green-600 text-white text-[12px] px-3 py-1.5 rounded-sm hover:bg-green-700">
-            ✓ Valider
-          </button>
-        )}
-        {item.statut !== "rejeté" && (
-          <button onClick={() => rejeter(table, item.id)} className="bg-yellow-500 text-white text-[12px] px-3 py-1.5 rounded-sm hover:bg-yellow-600">
-            ✗ Rejeter
-          </button>
-        )}
-        <button onClick={() => supprimer(table, item.id)} className="bg-red-600 text-white text-[12px] px-3 py-1.5 rounded-sm hover:bg-red-700">
-          Supprimer
-        </button>
+        {item.statut !== "validé" && <button onClick={() => valider(table, item.id)} className="bg-green-600 text-white text-[12px] px-3 py-1.5 rounded-sm">Valider</button>}
+        {item.statut !== "rejeté" && <button onClick={() => rejeter(table, item.id)} className="bg-yellow-500 text-white text-[12px] px-3 py-1.5 rounded-sm">Rejeter</button>}
+        <button onClick={() => supprimer(table, item.id)} className="bg-red-600 text-white text-[12px] px-3 py-1.5 rounded-sm">Supprimer</button>
       </div>
     );
   }
@@ -96,29 +80,22 @@ export default function Admin() {
           <p className="text-[13.5px] text-[#6B6B6B] mb-6">CANEL-LCBK — accès réservé au bureau</p>
           <form onSubmit={connecter} className="flex flex-col gap-4">
             <div>
-              <div>
-  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Mot de passe</label>
-  <div className="relative">
-    <input
-      type={voirMdp ? "text" : "password"}
-      value={mdp}
-      onChange={(e) => setMdp(e.target.value)}
-      required
-      className="w-full border border-[#D5C9B8] rounded-sm px-4 py-2.5 pr-12 text-sm focus:outline-none focus:border-[#1E5A8E]"
-    />
-    <button
-      type="button"
-      onClick={() => setVoirMdp(!voirMdp)}
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1E5A8E] text-[12px]"
-    >
-      {voirMdp ? "Cacher" : "Voir"}
-    </button>
-  </div>
-</div>
+              <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Mot de passe</label>
+              <div className="relative">
+                <input
+                  type={voirMdp ? "text" : "password"}
+                  value={mdp}
+                  onChange={(e) => setMdp(e.target.value)}
+                  required
+                  className="w-full border border-[#D5C9B8] rounded-sm px-4 py-2.5 pr-16 text-sm focus:outline-none focus:border-[#1E5A8E]"
+                />
+                <button type="button" onClick={() => setVoirMdp(!voirMdp)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#6B6B6B] hover:text-[#1E5A8E]">
+                  {voirMdp ? "Cacher" : "Voir"}
+                </button>
+              </div>
+            </div>
             {erreurMdp && <p className="text-red-600 text-sm">Mot de passe incorrect.</p>}
-            <button type="submit" className="bg-[#1E5A8E] text-white font-medium px-5 py-2.5 rounded-sm">
-              Accéder
-            </button>
+            <button type="submit" className="bg-[#1E5A8E] text-white font-medium px-5 py-2.5 rounded-sm">Accéder</button>
           </form>
         </div>
       </div>
@@ -128,28 +105,21 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
       <div className="bg-[#1E5A8E] text-white px-5 md:px-8 py-4 flex justify-between items-center">
-        <div>
-          <span className="font-serif text-lg">Administration CANEL-LCBK</span>
-          <span className="text-[#A8CBE8] text-sm ml-4">Bureau</span>
-        </div>
+        <span className="font-serif text-lg">Administration CANEL-LCBK</span>
         <button onClick={() => setConnecte(false)} className="text-sm text-[#A8CBE8] hover:text-white">Déconnexion</button>
       </div>
 
       <div className="max-w-[1120px] mx-auto px-5 md:px-8 py-8">
-        <div className="flex gap-2 mb-8 border-b border-[#D5C9B8] pb-4">
+        <div className="flex gap-2 mb-8 border-b border-[#D5C9B8] pb-4 flex-wrap">
           {(["annuaire", "actualites", "offres"] as const).map((o) => (
-            <button key={o} onClick={() => setOnglet(o)} className={"px-5 py-2 rounded-sm text-sm font-medium transition " + (onglet === o ? "bg-[#1E5A8E] text-white" : "bg-[#F0EAE0] text-[#6B6B6B] hover:bg-[#D5C9B8]")}>
+            <button key={o} onClick={() => setOnglet(o)} className={"px-5 py-2 rounded-sm text-sm font-medium transition " + (onglet === o ? "bg-[#1E5A8E] text-white" : "bg-[#F0EAE0] text-[#6B6B6B]")}>
               {o === "annuaire" ? "Annuaire" : o === "actualites" ? "Actualités" : "Offres"}
             </button>
           ))}
-          <button onClick={chargerTout} className="ml-auto px-4 py-2 text-sm text-[#6B6B6B] border border-[#D5C9B8] rounded-sm hover:bg-[#F0EAE0]">
-            ↻ Actualiser
-          </button>
+          <button onClick={chargerTout} className="ml-auto px-4 py-2 text-sm text-[#6B6B6B] border border-[#D5C9B8] rounded-sm">Actualiser</button>
         </div>
 
-        {chargement ? (
-          <div className="text-center py-20 text-[#6B6B6B]">Chargement...</div>
-        ) : (
+        {chargement ? <div className="text-center py-20 text-[#6B6B6B]">Chargement...</div> : (
           <>
             {onglet === "annuaire" && (
               <div>
