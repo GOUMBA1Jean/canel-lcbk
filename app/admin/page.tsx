@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
-const MOT_DE_PASSE = "canel2024admin";
+const MOT_DE_PASSE = "canel2026@bureauexec";
 
 type Ancien = { id: string; prenom: string; nom: string; promotion: string; filiere: string; secteur: string; ville: string; statut: string; photo_url: string | null; };
 type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; statut: string; };
@@ -13,6 +13,7 @@ export default function Admin() {
   const [connecte, setConnecte] = useState(false);
   const [mdp, setMdp] = useState("");
   const [erreurMdp, setErreurMdp] = useState(false);
+  const [voirMdp, setVoirMdp] = useState(false);
   const [onglet, setOnglet] = useState<"annuaire" | "actualites" | "offres">("annuaire");
   const [anciens, setAnciens] = useState<Ancien[]>([]);
   const [actus, setActus] = useState<Actu[]>([]);
@@ -95,9 +96,25 @@ export default function Admin() {
           <p className="text-[13.5px] text-[#6B6B6B] mb-6">CANEL-LCBK — accès réservé au bureau</p>
           <form onSubmit={connecter} className="flex flex-col gap-4">
             <div>
-              <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Mot de passe</label>
-              <input type="password" value={mdp} onChange={(e) => setMdp(e.target.value)} required className="w-full border border-[#D5C9B8] rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
-            </div>
+              <div>
+  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Mot de passe</label>
+  <div className="relative">
+    <input
+      type={voirMdp ? "text" : "password"}
+      value={mdp}
+      onChange={(e) => setMdp(e.target.value)}
+      required
+      className="w-full border border-[#D5C9B8] rounded-sm px-4 py-2.5 pr-12 text-sm focus:outline-none focus:border-[#1E5A8E]"
+    />
+    <button
+      type="button"
+      onClick={() => setVoirMdp(!voirMdp)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B6B] hover:text-[#1E5A8E] text-[12px]"
+    >
+      {voirMdp ? "Cacher" : "Voir"}
+    </button>
+  </div>
+</div>
             {erreurMdp && <p className="text-red-600 text-sm">Mot de passe incorrect.</p>}
             <button type="submit" className="bg-[#1E5A8E] text-white font-medium px-5 py-2.5 rounded-sm">
               Accéder
