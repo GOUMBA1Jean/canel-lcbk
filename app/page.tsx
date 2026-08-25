@@ -78,7 +78,7 @@ export default function Home() {
             Une chaîne qui <em className="text-[#B5966E] not-italic italic">continue</em>.
           </h1>
           <p className="text-[15px] md:text-lg leading-relaxed max-w-[520px] text-[#D0E4F2] mb-8">
-            Chaque promotion est un maillon. CANEL-LCBK relie les anciens élèves d&apos;hier à ceux d&apos;aujourd&apos;hui — pour le partage intellectuel, le brassage et la connaissance entre tous les ressortissants de notre établissement.
+            Chaque promotion est un maillon. CANEL-LCBK relie les anciens élèves d&apos;hier à ceux d&apos;aujourd&apos;hui : pour le partage intellectuel, le brassage et la connaissance entre tous les ressortissants de notre établissement.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <a href="/annuaire" className="bg-[#B5966E] text-white font-semibold text-[15px] px-6 py-3.5 rounded-sm text-center hover:bg-[#8B7355] transition">
