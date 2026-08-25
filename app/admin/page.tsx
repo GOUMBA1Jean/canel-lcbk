@@ -8,17 +8,24 @@ const MOT_DE_PASSE = "canel2026@admin";
 type Ancien = { id: string; prenom: string; nom: string; promotion: string; filiere: string; secteur: string; ville: string; statut: string; photo_url: string | null; };
 type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; statut: string; };
 type Offre = { id: string; titre: string; type: string; lieu: string; auteur: string; description: string; statut: string; };
+type MembreBureau = { id: string; nom: string; role: string; whatsapp: string; mail: string; ordre: number; };
 
 export default function Admin() {
   const [connecte, setConnecte] = useState(false);
   const [mdp, setMdp] = useState("");
   const [voirMdp, setVoirMdp] = useState(false);
   const [erreurMdp, setErreurMdp] = useState(false);
-  const [onglet, setOnglet] = useState<"annuaire" | "actualites" | "offres">("annuaire");
+  const [onglet, setOnglet] = useState<"annuaire" | "actualites" | "offres" | "orientation" | "bureau">("annuaire");
   const [anciens, setAnciens] = useState<Ancien[]>([]);
   const [actus, setActus] = useState<Actu[]>([]);
   const [offres, setOffres] = useState<Offre[]>([]);
+  const [orientations, setOrientations] = useState<{id:string;type:string;titre:string;texte:string;auteur:string;statut:string}[]>([]);
   const [chargement, setChargement] = useState(false);
+  const [bureau, setBureau] = useState<MembreBureau[]>([]);
+  const [modalBureau, setModalBureau] = useState<"" | "ajouter" | "modifier" | "supprimer">("");
+  const [selectionBureau, setSelectionBureau] = useState<MembreBureau | null>(null);
+  const [formBureau, setFormBureau] = useState({ nom: "", role: "", whatsapp: "", mail: "", ordre: 0 });
+  const [envoiBureau, setEnvoiBureau] = useState<"idle" | "chargement" | "succes" | "erreur">("idle");
 
   function connecter(e: React.FormEvent) {
     e.preventDefault();
@@ -30,14 +37,18 @@ export default function Admin() {
 
   async function chargerTout() {
     setChargement(true);
-    const [a, ac, of] = await Promise.all([
+    const [a, ac, of, or, bu] = await Promise.all([
       supabase.from("anciens").select("*").order("created_at", { ascending: false }),
       supabase.from("actualites").select("*").order("created_at", { ascending: false }),
       supabase.from("offres").select("*").order("created_at", { ascending: false }),
+      supabase.from("orientation").select("*").order("created_at", { ascending: false }),
+      supabase.from("bureau").select("*").order("ordre"),
     ]);
     setAnciens(a.data || []);
     setActus(ac.data || []);
     setOffres(of.data || []);
+    setOrientations(or.data || []);
+    setBureau(bu.data || []);
     setChargement(false);
   }
 
@@ -54,6 +65,31 @@ export default function Admin() {
   async function supprimer(table: string, id: string) {
     if (!confirm("Confirmer la suppression définitive ?")) return;
     await supabase.from(table).delete().eq("id", id);
+    chargerTout();
+  }
+
+  async function ajouterMembre(e: React.FormEvent) {
+    e.preventDefault();
+    setEnvoiBureau("chargement");
+    const { error } = await supabase.from("bureau").insert([formBureau]);
+    if (error) { setEnvoiBureau("erreur"); }
+    else { setEnvoiBureau("succes"); chargerTout(); }
+  }
+
+  async function modifierMembre(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectionBureau) return;
+    setEnvoiBureau("chargement");
+    const { error } = await supabase.from("bureau").update(formBureau).eq("id", selectionBureau.id);
+    if (error) { setEnvoiBureau("erreur"); }
+    else { setEnvoiBureau("succes"); chargerTout(); }
+  }
+
+  async function supprimerMembre() {
+    if (!selectionBureau) return;
+    setEnvoiBureau("chargement");
+    await supabase.from("bureau").delete().eq("id", selectionBureau.id);
+    setModalBureau("");
     chargerTout();
   }
 
@@ -111,9 +147,9 @@ export default function Admin() {
 
       <div className="max-w-[1120px] mx-auto px-5 md:px-8 py-8">
         <div className="flex gap-2 mb-8 border-b border-[#D5C9B8] pb-4 flex-wrap">
-          {(["annuaire", "actualites", "offres"] as const).map((o) => (
+          {(["annuaire", "actualites", "offres", "orientation", "bureau"] as const).map((o) => (
             <button key={o} onClick={() => setOnglet(o)} className={"px-5 py-2 rounded-sm text-sm font-medium transition " + (onglet === o ? "bg-[#1E5A8E] text-white" : "bg-[#F0EAE0] text-[#6B6B6B]")}>
-              {o === "annuaire" ? "Annuaire" : o === "actualites" ? "Actualités" : "Offres"}
+              {o === "annuaire" ? "Annuaire" : o === "actualites" ? "Actualités" : o === "offres" ? "Offres" : o === "orientation" ? "Orientation" : "Bureau"}
             </button>
           ))}
           <button onClick={chargerTout} className="ml-auto px-4 py-2 text-sm text-[#6B6B6B] border border-[#D5C9B8] rounded-sm">Actualiser</button>
@@ -196,9 +232,150 @@ export default function Admin() {
                 </div>
               </div>
             )}
+
+            {onglet === "orientation" && (
+              <div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <h2 className="font-serif text-xl text-[#1E5A8E]">Témoignages et guides soumis</h2>
+                  <span className="text-sm text-[#6B6B6B]">{orientations.filter(o => o.statut === "en_attente").length} en attente</span>
+                </div>
+                <div className="flex flex-col gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
+                  {orientations.length === 0 && <div className="bg-[#FAFAF8] p-6 text-[#6B6B6B]">Aucune soumission.</div>}
+                  {orientations.map((o) => (
+                    <div key={o.id} className="bg-[#FAFAF8] p-5">
+                      <div className="flex justify-between items-start flex-wrap gap-2">
+                        <div>
+                          <span className="font-mono text-[11px] bg-[#5B9BD5] text-white px-2 py-0.5 rounded-sm mr-2">{o.type}</span>
+                          <h4 className="text-[15px] font-semibold text-[#1E5A8E] mt-1">{o.titre}</h4>
+                          <p className="text-[13px] text-[#6B6B6B] mt-1">{o.texte}</p>
+                          <p className="text-[12px] text-[#9a9a9a] mt-1">Par : {o.auteur}</p>
+                        </div>
+                        <Badge statut={o.statut} />
+                      </div>
+                      <Actions table="orientation" item={o} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {onglet === "bureau" && (
+              <div>
+                <div className="flex justify-between items-baseline mb-4">
+                  <h2 className="font-serif text-xl text-[#1E5A8E]">Membres du bureau</h2>
+                  <button
+                    onClick={() => { setModalBureau("ajouter"); setFormBureau({ nom: "", role: "", whatsapp: "", mail: "", ordre: bureau.length + 1 }); setEnvoiBureau("idle"); }}
+                    className="bg-[#1E5A8E] text-white text-sm font-medium px-4 py-2 rounded-sm"
+                  >
+                    + Ajouter
+                  </button>
+                </div>
+                <div className="flex flex-col gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
+                  {bureau.length === 0 && <div className="bg-[#FAFAF8] p-6 text-[#6B6B6B]">Aucun responsable enregistré.</div>}
+                  {bureau.map((m) => (
+                    <div key={m.id} className="bg-[#FAFAF8] p-5 flex justify-between items-start flex-wrap gap-2">
+                      <div>
+                        <h4 className="text-[15px] font-semibold text-[#1E5A8E]">{m.nom}</h4>
+                        <p className="text-[13px] text-[#6B6B6B]">{m.role} · Ordre : {m.ordre}</p>
+                        {m.whatsapp && <p className="text-[12px] text-[#9a9a9a]">WhatsApp : {m.whatsapp}</p>}
+                        {m.mail && <p className="text-[12px] text-[#9a9a9a]">Email : {m.mail}</p>}
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={() => { setSelectionBureau(m); setFormBureau({ nom: m.nom, role: m.role, whatsapp: m.whatsapp, mail: m.mail, ordre: m.ordre }); setModalBureau("modifier"); setEnvoiBureau("idle"); }}
+                            className="bg-[#1E5A8E] text-white text-[12px] px-3 py-1.5 rounded-sm"
+                          >
+                            Modifier
+                          </button>
+                          <button
+                            onClick={() => { setSelectionBureau(m); setModalBureau("supprimer"); setEnvoiBureau("idle"); }}
+                            className="bg-red-600 text-white text-[12px] px-3 py-1.5 rounded-sm"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
+
+      {/* Modals bureau */}
+      {(modalBureau === "ajouter" || modalBureau === "modifier") && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-30 p-6" onClick={() => setModalBureau("")}>
+          <div className="bg-[#FAFAF8] rounded max-w-lg w-full p-8 border border-[#D5C9B8] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-serif text-2xl text-[#1E5A8E] mb-6">
+              {modalBureau === "ajouter" ? "Ajouter un responsable" : "Modifier le responsable"}
+            </h3>
+            {envoiBureau === "succes" ? (
+              <div>
+                <p className="text-green-600 font-medium mb-4">✓ Opération effectuée avec succès.</p>
+                <button onClick={() => setModalBureau("")} className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm">Fermer</button>
+              </div>
+            ) : (
+              <form onSubmit={modalBureau === "ajouter" ? ajouterMembre : modifierMembre} className="flex flex-col gap-4">
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Nom complet</label>
+                    <input type="text" required value={formBureau.nom} onChange={(e) => setFormBureau({ ...formBureau, nom: e.target.value })}
+                      className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
+                  </div>
+                  <div className="w-24">
+                    <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Ordre</label>
+                    <input type="number" value={formBureau.ordre} onChange={(e) => setFormBureau({ ...formBureau, ordre: parseInt(e.target.value) })}
+                      className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Rôle / Poste</label>
+                  <input type="text" required value={formBureau.role} onChange={(e) => setFormBureau({ ...formBureau, role: e.target.value })}
+                    placeholder="ex : Secrétaire général" className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Numéro WhatsApp</label>
+                  <input type="text" value={formBureau.whatsapp} onChange={(e) => setFormBureau({ ...formBureau, whatsapp: e.target.value })}
+                    placeholder="ex : 23566308130" className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Email</label>
+                  <input type="email" value={formBureau.mail} onChange={(e) => setFormBureau({ ...formBureau, mail: e.target.value })}
+                    className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
+                </div>
+                {envoiBureau === "erreur" && <p className="text-red-600 text-sm">Une erreur s&apos;est produite. Réessayez.</p>}
+                <div className="flex gap-3 mt-2">
+                  <button type="submit" disabled={envoiBureau === "chargement"}
+                    className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm disabled:opacity-60">
+                    {envoiBureau === "chargement" ? "Enregistrement..." : "Enregistrer"}
+                  </button>
+                  <button type="button" onClick={() => setModalBureau("")} className="text-sm text-[#6B6B6B] px-4 py-2.5">Annuler</button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {modalBureau === "supprimer" && selectionBureau && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-30 p-6" onClick={() => setModalBureau("")}>
+          <div className="bg-[#FAFAF8] rounded max-w-sm w-full p-8 border border-[#D5C9B8]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-serif text-xl text-[#1E5A8E] mb-2">Supprimer ce responsable ?</h3>
+            <p className="text-[13.5px] text-[#6B6B6B] mb-6">
+              <strong>{selectionBureau.nom}</strong> ({selectionBureau.role}) sera retiré définitivement.
+            </p>
+            {envoiBureau === "erreur" && <p className="text-red-600 text-sm mb-4">Une erreur s&apos;est produite.</p>}
+            <div className="flex gap-3">
+              <button onClick={supprimerMembre} disabled={envoiBureau === "chargement"}
+                className="bg-red-600 text-white text-sm font-medium px-5 py-2.5 rounded-sm disabled:opacity-60">
+                {envoiBureau === "chargement" ? "Suppression..." : "Confirmer"}
+              </button>
+              <button onClick={() => setModalBureau("")} className="text-sm text-[#6B6B6B] px-4 py-2.5">Annuler</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

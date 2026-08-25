@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 
-type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; created_at: string; };
+type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; fichier_url?: string; created_at: string; };
 
 const TAGS = ["Établissement", "Formation", "Contribution", "Rencontre", "Autre"];
 
@@ -13,6 +13,7 @@ export default function Actualites() {
   const [formulaire, setFormulaire] = useState(false);
   const [envoi, setEnvoi] = useState<"idle" | "chargement" | "succes" | "erreur">("idle");
   const [nouveau, setNouveau] = useState({ titre: "", contenu: "", tag: "Établissement", auteur: "" });
+  const [fichier, setFichier] = useState<File | null>(null);
 
   useEffect(() => { charger(); }, []);
 
@@ -26,9 +27,24 @@ export default function Actualites() {
   async function soumettre(e: React.FormEvent) {
     e.preventDefault();
     setEnvoi("chargement");
-    const { error } = await supabase.from("actualites").insert([{ ...nouveau, statut: "en_attente" }]);
+
+    let fichier_url = "";
+    if (fichier) {
+      const ext = fichier.name.split(".").pop();
+      const nom = `actualites/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("documents").upload(nom, fichier);
+      if (uploadError) { setEnvoi("erreur"); return; }
+      const { data: urlData } = supabase.storage.from("documents").getPublicUrl(nom);
+      fichier_url = urlData.publicUrl;
+    }
+
+    const { error } = await supabase.from("actualites").insert([{ ...nouveau, statut: "en_attente", fichier_url }]);
     if (error) { setEnvoi("erreur"); }
-    else { setEnvoi("succes"); setNouveau({ titre: "", contenu: "", tag: "Établissement", auteur: "" }); }
+    else {
+      setEnvoi("succes");
+      setNouveau({ titre: "", contenu: "", tag: "Établissement", auteur: "" });
+      setFichier(null);
+    }
   }
 
   function formatDate(d: string) {
@@ -68,6 +84,12 @@ export default function Actualites() {
                     <h4 className="text-[17px] text-[#1E5A8E] mt-2 mb-1">{a.titre}</h4>
                     <p className="text-[14px] text-[#6B6B6B] leading-relaxed">{a.contenu}</p>
                     <p className="text-[12px] text-[#9a9a9a] mt-2">Par : {a.auteur}</p>
+                    {a.fichier_url && (
+                      <a href={a.fichier_url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 mt-2 text-[12px] text-[#1E5A8E] underline underline-offset-2">
+                        📎 Voir le document joint
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
@@ -106,10 +128,22 @@ export default function Actualites() {
                   <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Votre nom</label>
                   <input type="text" required value={nouveau.auteur} onChange={(e) => setNouveau({ ...nouveau, auteur: e.target.value })} placeholder="Votre nom complet" className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">
+                    Pièce jointe <span className="font-normal text-[#9a9a9a]">(PDF, Word, image — optionnel)</span>
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    onChange={(e) => setFichier(e.target.files?.[0] || null)}
+                    className="w-full text-sm text-[#6B6B6B] file:mr-3 file:py-1.5 file:px-4 file:rounded-sm file:border-0 file:text-sm file:bg-[#1E5A8E] file:text-white cursor-pointer"
+                  />
+                  {fichier && <p className="text-[12px] text-[#6B6B6B] mt-1">📎 {fichier.name}</p>}
+                </div>
                 {envoi === "erreur" && <p className="text-red-600 text-sm">Une erreur s&apos;est produite. Réessayez.</p>}
                 <div className="flex gap-3 mt-2">
                   <button type="submit" disabled={envoi === "chargement"} className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm disabled:opacity-60">
-                    {envoi === "chargement" ? "Envoi..." : "Soumettre"}
+                    {envoi === "chargement" ? "Envoi en cours..." : "Soumettre"}
                   </button>
                   <button type="button" onClick={() => setFormulaire(false)} className="text-sm text-[#6B6B6B] px-4 py-2.5">Annuler</button>
                 </div>
