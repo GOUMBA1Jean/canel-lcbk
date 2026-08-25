@@ -1,3 +1,8 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { supabase } from "./lib/supabase";
+
 const piliers = [
   { num: "01", titre: "Annuaire", texte: "Retrouvez un ancien par promotion, filière ou secteur d'activité." },
   { num: "02", titre: "Orientation", texte: "Des guides et des témoignages pour aider les nouveaux bacheliers à choisir leur voie." },
@@ -14,11 +19,51 @@ const presentiel = [
   { num: "03", titre: "Brassage entre générations", texte: "Anciens et nouveaux élèves se retrouvent en présentiel, dans le prolongement des échanges du canal." },
 ];
 
-const offres = [
-  { titre: "Stage — Développement web", type: "Stage", lieu: "N'Djamena", auteur: "Partagé par un ancien" },
-  { titre: "Poste — Agent de santé communautaire", type: "Emploi", lieu: "Sarh", auteur: "Partagé par un ancien" },
-  { titre: "Bourse d'études — Licence en sciences", type: "Bourse", lieu: "N'Djamena", auteur: "Partagé par le bureau" },
-];
+type Offre = { id: string; titre: string; type: string; lieu: string; auteur: string; };
+
+function SectionOffres() {
+  const [offres, setOffres] = useState<Offre[]>([]);
+  const [chargement, setChargement] = useState(true);
+
+  useEffect(() => {
+    supabase.from("offres").select("id, titre, type, lieu, auteur").eq("statut", "validé").order("created_at", { ascending: false }).limit(4)
+      .then(({ data }) => { setOffres(data || []); setChargement(false); });
+  }, []);
+
+  return (
+    <section className="py-20 bg-[#FAFAF8]">
+      <div className="max-w-[1120px] mx-auto px-5 md:px-8">
+        <div className="max-w-[560px] mb-12">
+          <div className="font-mono text-xs uppercase tracking-wide text-[#8B7355] mb-3">Insertion professionnelle</div>
+          <h2 className="font-serif text-[34px] text-[#1E5A8E]">Offres partagées par le réseau</h2>
+        </div>
+        {chargement ? (
+          <div className="text-[#6B6B6B] text-sm">Chargement des offres...</div>
+        ) : offres.length === 0 ? (
+          <div className="bg-[#F0EAE0] border border-[#D5C9B8] rounded p-6 text-[#6B6B6B] text-[14px]">
+            Aucune offre disponible pour le moment.{" "}
+            <a href="/offres" className="text-[#1E5A8E] underline">Soyez le premier à en partager une.</a>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-px bg-[#D5C9B8] border border-[#D5C9B8] mb-4">
+            {offres.map((o) => (
+              <div key={o.id} className="bg-[#FAFAF8] p-5 px-6 flex justify-between items-center flex-wrap gap-3">
+                <div>
+                  <h4 className="text-[15px] text-[#1E5A8E] mb-1">{o.titre}</h4>
+                  <p className="text-[13px] text-[#6B6B6B]">{o.auteur} · {o.lieu}</p>
+                </div>
+                <span className="font-mono text-[11px] bg-[#B5966E] text-white px-2.5 py-1.5 rounded-sm">{o.type}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <a href="/offres" className="inline-block mt-2 text-[#1E5A8E] text-sm font-medium underline">
+          Voir toutes les offres →
+        </a>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   return (
@@ -95,7 +140,7 @@ export default function Home() {
           <div className="ribbon flex overflow-x-auto pb-5 gap-0">
             {promotions.map((yr, i) => (
               <div key={yr} className="flex items-center flex-none">
-                <div className={`w-[130px] rounded border p-4 bg-white/5 ${i === promotions.length - 1 ? "border-[#B5966E]" : "border-white/15"}`}>
+                <div className={"w-[130px] rounded border p-4 bg-white/5 " + (i === promotions.length - 1 ? "border-[#B5966E]" : "border-white/15")}>
                   <div className="font-mono text-[12px] text-[#A8CBE8]">{yr}</div>
                   <div className="text-[12px] text-[#D0E4F2] mt-1">{i === promotions.length - 1 ? "Actuelle" : "Promotion"}</div>
                 </div>
@@ -173,27 +218,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* OFFRES */}
-      <section className="py-20 bg-[#FAFAF8]">
-        <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-          <div className="max-w-[560px] mb-12">
-            <div className="font-mono text-xs uppercase tracking-wide text-[#8B7355] mb-3">Insertion professionnelle</div>
-            <h2 className="font-serif text-[34px] text-[#1E5A8E]">Offres partagées par le réseau</h2>
-          </div>
-          <div className="flex flex-col gap-px bg-[#D5C9B8] border border-[#D5C9B8] mb-4">
-            {offres.map((o) => (
-              <div key={o.titre} className="bg-[#FAFAF8] p-5 px-6 flex justify-between items-center flex-wrap gap-3">
-                <div>
-                  <h4 className="text-[15px] text-[#1E5A8E] mb-1">{o.titre}</h4>
-                  <p className="text-[13px] text-[#6B6B6B]">{o.auteur} · {o.lieu}</p>
-                </div>
-                <span className="font-mono text-[11px] bg-[#B5966E] text-white px-2.5 py-1.5 rounded-sm">{o.type}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-[12px] text-[#9a9a9a] italic">Exemples illustratifs pour la démonstration.</p>
-        </div>
-      </section>
+      {/* OFFRES DYNAMIQUES */}
+      <SectionOffres />
     </>
   );
 }
