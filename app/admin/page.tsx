@@ -8,7 +8,7 @@ const MOT_DE_PASSE = "canel2026@admin";
 type Ancien = { id: string; prenom: string; nom: string; promotion: string; filiere: string; secteur: string; ville: string; statut: string; photo_url: string | null; };
 type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; statut: string; };
 type Offre = { id: string; titre: string; type: string; lieu: string; auteur: string; description: string; statut: string; };
-type MembreBureau = { id: string; nom: string; role: string; whatsapp: string; mail: string; ordre: number; };
+type MembreBureau = { id: string; nom: string; role: string; whatsapp: string; mail: string; ordre: number; photo_url?: string; };
 type Conseiller = { id: string; nom: string; whatsapp: string; mail: string; ordre: number; };
 
 export default function Admin() {
@@ -27,6 +27,7 @@ export default function Admin() {
   const [selectionBureau, setSelectionBureau] = useState<MembreBureau | null>(null);
   const [formBureau, setFormBureau] = useState({ nom: "", role: "", whatsapp: "", mail: "", ordre: 0 });
   const [envoiBureau, setEnvoiBureau] = useState<"idle" | "chargement" | "succes" | "erreur">("idle");
+  const [photoBureau, setPhotoBureau] = useState<File | null>(null);
   const [conseillers, setConseillers] = useState<Conseiller[]>([]);
   const [modalConseiller, setModalConseiller] = useState<"" | "ajouter" | "modifier" | "supprimer">("");
   const [selectionConseiller, setSelectionConseiller] = useState<Conseiller | null>(null);
@@ -77,21 +78,39 @@ export default function Admin() {
   }
 
   async function ajouterMembre(e: React.FormEvent) {
-    e.preventDefault();
-    setEnvoiBureau("chargement");
-    const { error } = await supabase.from("bureau").insert([formBureau]);
-    if (error) { setEnvoiBureau("erreur"); }
-    else { setEnvoiBureau("succes"); chargerTout(); }
+  e.preventDefault();
+  setEnvoiBureau("chargement");
+  let photo_url = "";
+  if (photoBureau) {
+    const ext = photoBureau.name.split(".").pop();
+    const nom = `bureau/${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("photos").upload(nom, photoBureau);
+    if (upErr) { setEnvoiBureau("erreur"); return; }
+    const { data: urlData } = supabase.storage.from("photos").getPublicUrl(nom);
+    photo_url = urlData.publicUrl;
   }
+  const { error } = await supabase.from("bureau").insert([{ ...formBureau, photo_url }]);
+  if (error) { setEnvoiBureau("erreur"); }
+  else { setEnvoiBureau("succes"); setPhotoBureau(null); chargerTout(); }
+}
 
-  async function modifierMembre(e: React.FormEvent) {
-    e.preventDefault();
-    if (!selectionBureau) return;
-    setEnvoiBureau("chargement");
-    const { error } = await supabase.from("bureau").update(formBureau).eq("id", selectionBureau.id);
-    if (error) { setEnvoiBureau("erreur"); }
-    else { setEnvoiBureau("succes"); chargerTout(); }
+async function modifierMembre(e: React.FormEvent) {
+  e.preventDefault();
+  if (!selectionBureau) return;
+  setEnvoiBureau("chargement");
+  let photo_url = selectionBureau.photo_url || "";
+  if (photoBureau) {
+    const ext = photoBureau.name.split(".").pop();
+    const nom = `bureau/${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("photos").upload(nom, photoBureau);
+    if (upErr) { setEnvoiBureau("erreur"); return; }
+    const { data: urlData } = supabase.storage.from("photos").getPublicUrl(nom);
+    photo_url = urlData.publicUrl;
   }
+  const { error } = await supabase.from("bureau").update({ ...formBureau, photo_url }).eq("id", selectionBureau.id);
+  if (error) { setEnvoiBureau("erreur"); }
+  else { setEnvoiBureau("succes"); setPhotoBureau(null); chargerTout(); }
+}
 
   async function supprimerMembre() {
     if (!selectionBureau) return;
@@ -486,6 +505,21 @@ async function supprimerConseiller() {
                   <input type="email" value={formBureau.mail} onChange={(e) => setFormBureau({ ...formBureau, mail: e.target.value })}
                     className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
                 </div>
+                <div>
+  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">
+    Photo <span className="font-normal text-[#9a9a9a]">(JPG, PNG — optionnel)</span>
+  </label>
+  <input
+    type="file"
+    accept=".jpg,.jpeg,.png"
+    onChange={(e) => setPhotoBureau(e.target.files?.[0] || null)}
+    className="w-full text-sm text-[#6B6B6B] file:mr-3 file:py-1.5 file:px-4 file:rounded-sm file:border-0 file:text-sm file:bg-[#1E5A8E] file:text-white cursor-pointer"
+  />
+  {photoBureau && <p className="text-[12px] text-[#6B6B6B] mt-1">📷 {photoBureau.name}</p>}
+  {!photoBureau && selectionBureau?.photo_url && (
+    <p className="text-[12px] text-[#9a9a9a] mt-1">Photo actuelle déjà enregistrée</p>
+  )}
+</div>
                 {envoiBureau === "erreur" && <p className="text-red-600 text-sm">Une erreur s&apos;est produite. Réessayez.</p>}
                 <div className="flex gap-3 mt-2">
                   <button type="submit" disabled={envoiBureau === "chargement"}
