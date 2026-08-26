@@ -166,10 +166,11 @@ export default function Contribution() {
             La contribution de chaque élève permet de soutenir l&apos;éducation de ses successeurs au Lycée Collège la Bénédiction de Kyabé.
           </p>
           
-            <a>href="https://chat.whatsapp.com/JuQvIvpnfdcH06e62u1zsc?s=cl&p=a&ilr=1"
+            <a href="https://chat.whatsapp.com/JuQvIvpnfdcH06e62u1zsc?s=cl&p=a&ilr=1"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-[#8B7355] text-white font-semibold text-[15px] px-7 py-3.5 rounded-sm"
+            >
             Participer depuis CANEL-LCBK
           </a>
         </div>
