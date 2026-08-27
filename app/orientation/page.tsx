@@ -11,8 +11,14 @@ export default function Orientation() {
   const [formulaire, setFormulaire] = useState(false);
   const [envoi, setEnvoi] = useState<"idle" | "chargement" | "succes" | "erreur">("idle");
   const [nouveau, setNouveau] = useState({ type: "Témoignage", titre: "", texte: "", auteur: "" });
+  const [conseillers, setConseillers] = useState<
+  { id: string; nom: string; whatsapp: string; mail: string; ordre: number }[]
+>([]);
 
-  useEffect(() => { charger(); }, []);
+  useEffect(() => {
+  charger();
+  chargerConseillers();
+}, []);
 
   async function charger() {
     setChargement(true);
@@ -20,6 +26,17 @@ export default function Orientation() {
     setItems(data || []);
     setChargement(false);
   }
+
+  async function chargerConseillers() {
+  const { data, error } = await supabase
+    .from("conseillers")
+    .select("*")
+    .order("ordre", { ascending: true });
+
+  if (!error) {
+    setConseillers(data || []);
+  }
+}
 
   async function soumettre(e: React.FormEvent) {
     e.preventDefault();
@@ -90,10 +107,7 @@ export default function Orientation() {
               Ces membres de CANEL-LCBK sont spécialement chargés de l&apos;orientation des nouveaux bacheliers.
             </p>
             <div className="flex flex-col gap-4">
-              {[
-                { nom: "BOUGUIE AMMIEL GALI", whatsapp: "23565627095", mail: "ammielgali@gmail.com" },
-                { nom: "OUYA EPHRAHIM MADJALO", whatsapp: "23568383778", mail: "ephrahimouya@gmail.com" },
-              ].map((m) => (
+              {conseillers.map((m) => (
                 <div key={m.nom} className="bg-white border border-[#D5C9B8] rounded p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <div className="text-[14px] font-semibold text-[#1E5A8E]">{m.nom}</div>
