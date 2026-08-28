@@ -75,28 +75,27 @@ export default function Annuaire() {
     return matchNom && matchPromo && matchSecteur;
   }), [anciens, recherche, promo, secteur]);
 
-  function Avatar({ ancien, taille = 44 }: { ancien: Ancien; taille?: number }) {
-    if (ancien.photo_url) {
-      return (
-        <div className="rounded-full overflow-hidden shrink-0" style={{ width: taille, height: taille }}>
-          <Image src={ancien.photo_url} alt={ancien.prenom} width={taille} height={taille} className="object-cover w-full h-full" />
-          <Image
-  src={ancien.photo_url}
-  alt={ancien.prenom}
-  width={taille}
-  height={taille}
-  sizes="(max-width: 768px) 44px, 80px"
-  className="object-cover w-full h-full"
-/>
-        </div>
-      );
-    }
+ function Avatar({ ancien, taille = 44 }: { ancien: Ancien; taille?: number }) {
+  if (ancien.photo_url) {
     return (
-      <div className="rounded-full bg-[#1E5A8E] text-[#A8CBE8] flex items-center justify-center font-serif shrink-0" style={{ width: taille, height: taille, fontSize: taille * 0.4 }}>
-        {ancien.prenom.charAt(0)}
+      <div className="rounded-full overflow-hidden shrink-0" style={{ width: taille, height: taille }}>
+        <Image
+          src={ancien.photo_url}
+          alt={ancien.prenom}
+          width={taille}
+          height={taille}
+          sizes="(max-width: 768px) 44px, 80px"
+          className="object-cover w-full h-full"
+        />
       </div>
     );
   }
+  return (
+    <div className="rounded-full bg-[#1E5A8E] text-[#A8CBE8] flex items-center justify-center font-serif shrink-0" style={{ width: taille, height: taille, fontSize: taille * 0.4 }}>
+      {ancien.prenom.charAt(0)}
+    </div>
+  );
+}
 
   return (
     

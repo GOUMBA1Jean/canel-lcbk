@@ -30,16 +30,8 @@ export const metadata: Metadata = {
     default: "CANEL-LCBK — Cercle des Anciens et Nouveaux Élèves",
     template: "%s | CANEL-LCBK",
   },
-  description:
-    "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé (CANEL-LCBK). Annuaire, orientation, offres d'emploi et actualités.",
-  keywords: [
-    "CANEL-LCBK",
-    "Lycée Bénédiction Kyabé",
-    "anciens élèves Kyabé",
-    "LCBK Tchad",
-    "orientation baccalauréat Tchad",
-    "ressortissants Bénédiction",
-  ],
+  description: "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé (CANEL-LCBK). Annuaire, orientation, offres d'emploi et actualités.",
+  keywords: ["CANEL-LCBK", "Lycée Bénédiction Kyabé", "anciens élèves Kyabé", "LCBK Tchad", "orientation baccalauréat Tchad", "ressortissants Bénédiction"],
   authors: [{ name: "CANEL-LCBK" }],
   creator: "CANEL-LCBK",
   metadataBase: new URL("https://canel-lcbk.vercel.app"),
@@ -49,59 +41,36 @@ export const metadata: Metadata = {
     url: "https://canel-lcbk.vercel.app",
     siteName: "CANEL-LCBK",
     title: "CANEL-LCBK — Cercle des Anciens et Nouveaux Élèves",
-    description:
-      "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé. Annuaire, orientation, offres et actualités.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "CANEL-LCBK — Lycée Collège la Bénédiction de Kyabé",
-      },
-    ],
+    description: "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé. Annuaire, orientation, offres et actualités.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "CANEL-LCBK — Lycée Collège la Bénédiction de Kyabé" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "CANEL-LCBK — Cercle des Anciens et Nouveaux Élèves",
-    description:
-      "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé.",
+    description: "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé.",
     images: ["/og-image.png"],
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
+    googleBot: { index: true, follow: true },
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className="scroll-smooth">
-      <body
-        className={`${fraunces.variable} ${inter.variable} ${plexMono.variable} font-sans bg-[#FAFAF8] text-[#1a1a1a] antialiased`}
-      >
+      <body className={`${fraunces.variable} ${inter.variable} ${plexMono.variable} font-sans bg-[#FAFAF8] text-[#1a1a1a] antialiased`}>
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-[#1E5A8E] text-white px-4 py-2 rounded-sm z-50">
-  Aller au contenu principal
-</a>
+          Aller au contenu principal
+        </a>
         <Header />
-<main id="main-content">
-  {children}
-</main>
-<Footer />
-<Header />
-<main id="main-content">
-  {children}
-</main>
-<Footer />
-<Analytics />
-<SpeedInsights />
+        <main id="main-content">
+          {children}
+        </main>
+        <Footer />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
