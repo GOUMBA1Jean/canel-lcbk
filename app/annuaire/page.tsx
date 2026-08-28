@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { supabase } from "../lib/supabase";
+import { SkeletonCard } from "../components/Skeleton";
 
 type Ancien = {
   id: string;
@@ -45,6 +46,8 @@ export default function Annuaire() {
     setApercu(URL.createObjectURL(fichier));
   }
 
+  
+
   async function inscrire(e: React.FormEvent) {
     e.preventDefault();
     setEnvoi("chargement");
@@ -77,6 +80,14 @@ export default function Annuaire() {
       return (
         <div className="rounded-full overflow-hidden shrink-0" style={{ width: taille, height: taille }}>
           <Image src={ancien.photo_url} alt={ancien.prenom} width={taille} height={taille} className="object-cover w-full h-full" />
+          <Image
+  src={ancien.photo_url}
+  alt={ancien.prenom}
+  width={taille}
+  height={taille}
+  sizes="(max-width: 768px) 44px, 80px"
+  className="object-cover w-full h-full"
+/>
         </div>
       );
     }
@@ -88,6 +99,7 @@ export default function Annuaire() {
   }
 
   return (
+    
     <>
       <section className="bg-[#1E5A8E] text-white py-16">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -115,7 +127,9 @@ export default function Annuaire() {
           </div>
 
           {chargement ? (
-            <div className="text-center py-20 text-[#6B6B6B]">Chargement de l&apos;annuaire...</div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
+    {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+  </div>
           ) : anciens.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-[#6B6B6B] mb-4">L&apos;annuaire est vide pour l&apos;instant.</p>
@@ -217,3 +231,4 @@ export default function Annuaire() {
     </>
   );
 }
+

@@ -16,7 +16,7 @@ const promotions = ["2009–2010","2010–2011","2011–2012","2012–2013","201
 const presentiel = [
   { num: "01", titre: "Formations et conférences", texte: "Les membres de CANEL-LCBK organisent des sessions de partage de connaissances au sein de l'établissement." },
   { num: "02", titre: "Rencontres avec l'administration", texte: "Des réunions régulières avec la direction pour faire avancer les projets d'amélioration de l'établissement." },
-  { num: "03", titre: "Brassage entre générations", texte: "Anciens et nouveaux élèves se retrouvent en présentiel, dans le prolongement des échanges du canal." },
+  { num: "03", titre: "Brassage entre générations", texte: "Anciens et nouveaux élèves se retrouvent au siège siège, dans le prolongement des échanges de l'association." },
 ];
 
 type Offre = { id: string; titre: string; type: string; lieu: string; auteur: string; };

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
+import { SkeletonLigne } from "../components/Skeleton";
 
 type Offre = { id: string; titre: string; type: string; lieu: string; auteur: string; description: string; fichier_url?: string; created_at: string; };
 
@@ -67,7 +68,9 @@ export default function Offres() {
       <section className="py-14 bg-[#FAFAF8]">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
           {chargement ? (
-            <div className="text-center py-20 text-[#6B6B6B]">Chargement...</div>
+  <div className="flex flex-col gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
+    {[...Array(4)].map((_, i) => <SkeletonLigne key={i} />)}
+  </div>
           ) : offres.length === 0 ? (
             <div className="text-center py-20 text-[#6B6B6B]">Aucune offre publiée pour le moment.</div>
           ) : (
