@@ -34,11 +34,11 @@ export const metadata: Metadata = {
   keywords: ["CANEL-LCBK", "Lycée Bénédiction Kyabé", "anciens élèves Kyabé", "LCBK Tchad", "orientation baccalauréat Tchad", "ressortissants Bénédiction"],
   authors: [{ name: "CANEL-LCBK" }],
   creator: "CANEL-LCBK",
-  metadataBase: new URL("https://canel-lcbk.vercel.app"),
+  metadataBase: new URL("https://canel-cblk.vercel.app"),
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://canel-lcbk.vercel.app",
+    url: "https://canel-cblk.vercel.app",
     siteName: "CANEL-LCBK",
     title: "CANEL-LCBK — Cercle des Anciens et Nouveaux Élèves",
     description: "Plateforme officielle du Cercle des Anciens et Nouveaux Élèves du Lycée Collège la Bénédiction de Kyabé. Annuaire, orientation, offres et actualités.",
