@@ -115,15 +115,29 @@ export default function Annuaire() {
 
       <section className="py-12 bg-[#FAFAF8]">
         <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-          <div className="flex flex-wrap gap-3 mb-4">
-            <input type="text" placeholder="Rechercher un nom..." value={recherche} onChange={(e) => setRecherche(e.target.value)} className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm flex-1 min-w-[200px] focus:outline-none focus:border-[#1E5A8E]" />
-            <select value={promo} onChange={(e) => setPromo(e.target.value)} className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm">
-              {promotions.map((p) => <option key={p} value={p}>{p === "Toutes" ? "Promotion" : p}</option>)}
-            </select>
-            <select value={secteur} onChange={(e) => setSecteur(e.target.value)} className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm">
-              {secteurs.map((s) => <option key={s} value={s}>{s === "Tous" ? "Secteur d'activité" : s}</option>)}
-            </select>
-          </div>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
+  <input
+    type="text"
+    placeholder="Rechercher un nom..."
+    value={recherche}
+    onChange={(e) => setRecherche(e.target.value)}
+    className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm w-full sm:flex-1 sm:min-w-[200px] focus:outline-none focus:border-[#1E5A8E]"
+  />
+  <select
+    value={promo}
+    onChange={(e) => setPromo(e.target.value)}
+    className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm w-full sm:w-auto"
+  >
+    {promotions.map((p) => <option key={p} value={p}>{p === "Toutes" ? "Promotion" : p}</option>)}
+  </select>
+  <select
+    value={secteur}
+    onChange={(e) => setSecteur(e.target.value)}
+    className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm w-full sm:w-auto"
+  >
+    {secteurs.map((s) => <option key={s} value={s}>{s === "Tous" ? "Secteur d'activité" : s}</option>)}
+  </select>
+</div>
 
           {chargement ? (
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
