@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const links = [
   { href: "/", label: "Accueil" },
@@ -36,9 +37,20 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-[#D5C9B8]">
       <div className="max-w-[1120px] mx-auto flex items-center justify-between px-5 py-3">
-        <Link href="/" className="font-serif font-semibold text-lg text-[#1E5A8E]" onClick={() => setOuvert(false)}>
-          CANEL<span className="text-[#8B7355]">-LCBK</span>
-        </Link>
+        import Image from "next/image";
+
+// ...
+
+<Link href="/" onClick={() => setOuvert(false)}>
+  <Image
+    src="/logo.png"
+    alt="CANEL-LCBK"
+    width={48}
+    height={48}
+    className="h-12 w-auto object-contain"
+    priority
+  />
+</Link>
         <nav className="hidden md:flex gap-6 text-sm font-medium">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="text-[#1a1a1a]/70 hover:text-[#1E5A8E] transition py-2">
