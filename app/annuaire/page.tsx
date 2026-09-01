@@ -41,8 +41,20 @@ export default function Annuaire() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(!!session);
     });
-    return () => subscription.unsubscribe();
+    return (
+  <AuthGuard>
+    <>
+      {/* tout le contenu existant */}
+    </>
+  </AuthGuard>
+);
   }, []);
+
+  
+
+
+
+  
 
   // Chargement annuaire
   useEffect(() => { chargerAnciens(); }, []);
