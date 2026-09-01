@@ -37,9 +37,6 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-[#D5C9B8]">
       <div className="max-w-[1120px] mx-auto flex items-center justify-between px-5 py-3">
-        import Image from "next/image";
-
-// ...
 
 <Link href="/" onClick={() => setOuvert(false)}>
   <Image
