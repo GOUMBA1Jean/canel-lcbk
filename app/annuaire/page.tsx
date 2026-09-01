@@ -1,3 +1,4 @@
+import AuthGuard from "../components/AuthGuard";
 "use client";
 export const dynamic = "force-dynamic";
 
