@@ -1,12 +1,11 @@
-import AuthGuard from "../components/AuthGuard";
 "use client";
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { SkeletonCard } from "../components/Skeleton";
+import AuthGuard from "../components/AuthGuard";
 
 type Ancien = {
   id: string;
@@ -19,8 +18,7 @@ type Ancien = {
   photo_url: string | null;
 };
 
-export default function Annuaire() {
-  const [session, setSession] = useState<boolean | null>(null);
+function ContenuAnnuaire() {
   const [anciens, setAnciens] = useState<Ancien[]>([]);
   const [chargement, setChargement] = useState(true);
   const [recherche, setRecherche] = useState("");
@@ -33,30 +31,6 @@ export default function Annuaire() {
   const [apercu, setApercu] = useState<string | null>(null);
   const [envoi, setEnvoi] = useState<"idle" | "chargement" | "succes" | "erreur">("idle");
 
-  // Vérification session
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(!!session);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(!!session);
-    });
-    return (
-  <AuthGuard>
-    <>
-      {/* tout le contenu existant */}
-    </>
-  </AuthGuard>
-);
-  }, []);
-
-  
-
-
-
-  
-
-  // Chargement annuaire
   useEffect(() => { chargerAnciens(); }, []);
 
   async function chargerAnciens() {
@@ -123,122 +97,81 @@ export default function Annuaire() {
     );
   }
 
-  // Chargement session
-  if (session === null) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-[#6B6B6B]">Chargement...</div>
-      </div>
-    );
-  }
-
-  // Accès bloqué pour les visiteurs
-  if (!session) {
-    return (
-      <>
-        <section className="bg-[#1E5A8E] text-white py-16">
-          <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-            <div className="font-mono text-[13px] tracking-wide uppercase text-[#A8CBE8] mb-4">CANEL-LCBK</div>
-            <h1 className="font-serif text-4xl md:text-5xl mb-4">L&apos;annuaire des anciens</h1>
-            <p className="text-[#D0E4F2] max-w-[560px] leading-relaxed">
-              Retrouvez un ancien par promotion, filière ou secteur d&apos;activité.
-            </p>
-          </div>
-        </section>
-
-        <section className="py-24 bg-[#FAFAF8]">
-          <div className="max-w-[480px] mx-auto px-5 text-center">
-            <div className="w-20 h-20 rounded-full bg-[#F0EAE0] border border-[#D5C9B8] flex items-center justify-center mx-auto mb-6">
-              <svg width="32" height="32" fill="none" stroke="#B5966E" strokeWidth="1.5" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-            </div>
-            <h2 className="font-serif text-2xl text-[#1E5A8E] mb-3">Accès réservé aux membres</h2>
-            <p className="text-[#6B6B6B] text-[14px] leading-relaxed mb-8">
-              L&apos;annuaire est réservé aux membres connectés de CANEL-LCBK.
-              Créez un compte pour accéder aux profils des anciens élèves.
-            </p>
-            <div className="flex flex-col gap-3">
-              <Link href="/connexion"
-                className="bg-[#1E5A8E] text-white font-medium px-6 py-3.5 rounded-sm text-sm text-center hover:bg-[#2970AA] transition">
-                Se connecter
-              </Link>
-              <Link href="/inscription"
-                className="border border-[#1E5A8E] text-[#1E5A8E] font-medium px-6 py-3.5 rounded-sm text-sm text-center hover:bg-[#F0EAE0] transition">
-                Créer un compte
-              </Link>
-            </div>
-          </div>
-        </section>
-      </>
-    );
-  }
-
-  // Annuaire complet pour les membres connectés
   return (
     <>
       <section className="bg-[#1E5A8E] text-white py-16">
-        <div className="max-w-[1120px] mx-auto px-5 md:px-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="max-w-[680px] mx-auto px-5 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <div className="font-mono text-[13px] tracking-wide uppercase text-[#A8CBE8] mb-4">CANEL-LCBK</div>
-            <h1 className="font-serif text-4xl md:text-5xl mb-4">L&apos;annuaire des anciens</h1>
-            <p className="text-[#D0E4F2] max-w-[560px] leading-relaxed">Retrouvez un ancien par promotion, filière ou secteur d&apos;activité.</p>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-6 h-px bg-[#B5966E]" />
+              <span className="text-[#B5966E] text-[11px] font-semibold tracking-[0.12em] uppercase">CANEL-LCBK · Réseau</span>
+            </div>
+            <h1 className="font-serif text-4xl md:text-5xl mb-4">Annuaire des anciens</h1>
+            <p className="text-[#D0E4F2] max-w-[480px] leading-relaxed">
+              Retrouvez un ancien par promotion, filière ou secteur d&apos;activité.
+            </p>
           </div>
           <button onClick={() => { setFormulaire(true); setEnvoi("idle"); }}
-            className="bg-[#B5966E] text-white font-semibold text-sm px-6 py-3 rounded-sm whitespace-nowrap shrink-0 hover:bg-[#8B7355] transition">
-            + M&apos;inscrire dans l&apos;annuaire
+            className="bg-[#B5966E] text-white font-semibold text-sm px-6 py-3 whitespace-nowrap shrink-0">
+            + M&apos;inscrire
           </button>
         </div>
       </section>
 
-      <section className="py-12 bg-[#FAFAF8]">
-        <div className="max-w-[1120px] mx-auto px-5 md:px-8">
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-4">
+      <section className="py-12 bg-[#F5F0E8]">
+        <div className="max-w-[680px] mx-auto px-5">
+          <div className="flex flex-col gap-3 mb-6">
             <input type="text" placeholder="Rechercher un nom..." value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm w-full sm:flex-1 sm:min-w-[200px] focus:outline-none focus:border-[#1E5A8E]" />
-            <select value={promo} onChange={(e) => setPromo(e.target.value)}
-              className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm w-full sm:w-auto">
-              {promotions.map((p) => <option key={p} value={p}>{p === "Toutes" ? "Promotion" : p}</option>)}
-            </select>
-            <select value={secteur} onChange={(e) => setSecteur(e.target.value)}
-              className="border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm w-full sm:w-auto">
-              {secteurs.map((s) => <option key={s} value={s}>{s === "Tous" ? "Secteur d'activité" : s}</option>)}
-            </select>
+              className="bg-white border border-[#D5C9B8] px-4 py-3 text-[15px] w-full focus:outline-none focus:border-[#1E5A8E]" />
+            <div className="flex gap-3">
+              <select value={promo} onChange={(e) => setPromo(e.target.value)}
+                className="bg-white border border-[#D5C9B8] px-4 py-3 text-[14px] flex-1 focus:outline-none">
+                {promotions.map((p) => <option key={p} value={p}>{p === "Toutes" ? "Toutes les promotions" : p}</option>)}
+              </select>
+              <select value={secteur} onChange={(e) => setSecteur(e.target.value)}
+                className="bg-white border border-[#D5C9B8] px-4 py-3 text-[14px] flex-1 focus:outline-none">
+                {secteurs.map((s) => <option key={s} value={s}>{s === "Tous" ? "Tous les secteurs" : s}</option>)}
+              </select>
+            </div>
           </div>
 
           {chargement ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
-              {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
+              {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : anciens.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-[#6B6B6B] mb-4">L&apos;annuaire est vide pour l&apos;instant.</p>
               <button onClick={() => { setFormulaire(true); setEnvoi("idle"); }}
-                className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm">
+                className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-3">
                 Être le premier à s&apos;inscrire
               </button>
             </div>
           ) : (
             <>
-              <div className="text-[12.5px] text-[#9a9a9a] italic mb-6">
+              <p className="text-[12px] text-[#9a9a9a] italic mb-5">
                 {resultats.length} membre{resultats.length > 1 ? "s" : ""} trouvé{resultats.length > 1 ? "s" : ""}
-              </div>
+              </p>
               {resultats.length === 0 ? (
-                <div className="text-center py-16 text-[#6B6B6B]">Aucun ancien ne correspond à cette recherche.</div>
+                <div className="text-center py-16 text-[#6B6B6B]">Aucun ancien ne correspond.</div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-[#D5C9B8] border border-[#D5C9B8]">
+                <div className="space-y-px">
                   {resultats.map((a) => (
                     <button key={a.id} onClick={() => setSelection(a)}
-                      className="bg-[#FAFAF8] p-6 text-left hover:bg-[#F0EAE0] transition cursor-pointer">
-                      <div className="mb-4"><Avatar ancien={a} taille={44} /></div>
-                      <h4 className="text-[16px] text-[#1E5A8E] mb-1">{a.prenom} {a.nom}</h4>
-                      <p className="text-[13px] text-[#6B6B6B] mb-3">Promotion {a.promotion} · {a.ville}</p>
-                      <div className="flex gap-2 flex-wrap">
-                        <span className="font-mono text-[11px] bg-[#F0EAE0] text-[#6B6B6B] px-2 py-1 rounded-sm">{a.filiere}</span>
-                        <span className="font-mono text-[11px] bg-[#F0EAE0] text-[#6B6B6B] px-2 py-1 rounded-sm">{a.secteur}</span>
+                      className="w-full bg-white p-6 text-left hover:bg-[#F5F0E8] transition flex items-start gap-4 border-b border-[#E8E0D0] last:border-0">
+                      <Avatar ancien={a} taille={48} />
+                      <div className="flex-1">
+                        <h4 className="font-serif text-[17px] text-[#1E5A8E] mb-0.5">{a.prenom} {a.nom}</h4>
+                        <p className="text-[13px] text-[#6B6B6B] mb-2">Promotion {a.promotion} · {a.ville}</p>
+                        <div className="flex gap-2 flex-wrap">
+                          <span className="text-[11px] text-[#B5966E] font-semibold uppercase tracking-wide">{a.filiere}</span>
+                          {a.secteur && <span className="text-[11px] text-[#9a9a9a]">· {a.secteur}</span>}
+                        </div>
                       </div>
+                      <svg width="16" height="16" fill="none" stroke="#B5966E" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0 mt-1">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
                     </button>
                   ))}
                 </div>
@@ -248,72 +181,88 @@ export default function Annuaire() {
         </div>
       </section>
 
+      {/* Fiche détaillée */}
       {selection && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-30 p-6" onClick={() => setSelection(null)}>
-          <div className="bg-[#FAFAF8] rounded max-w-md w-full p-8 border border-[#D5C9B8]" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-5"><Avatar ancien={selection} taille={80} /></div>
-            <h3 className="font-serif text-2xl text-[#1E5A8E] mb-1">{selection.prenom} {selection.nom}</h3>
-            <p className="text-sm text-[#6B6B6B] mb-5">Promotion {selection.promotion} · {selection.ville}</p>
-            <div className="flex gap-2 flex-wrap mb-6">
-              <span className="font-mono text-[11px] bg-[#F0EAE0] text-[#6B6B6B] px-2 py-1 rounded-sm">{selection.filiere}</span>
-              <span className="font-mono text-[11px] bg-[#F0EAE0] text-[#6B6B6B] px-2 py-1 rounded-sm">{selection.secteur}</span>
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-30 p-4 sm:p-6"
+          onClick={() => setSelection(null)}>
+          <div className="bg-white w-full max-w-md p-8 border-t-4 border-[#B5966E]"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-4 mb-6">
+              <Avatar ancien={selection} taille={64} />
+              <div>
+                <h3 className="font-serif text-[22px] text-[#1E5A8E]">{selection.prenom} {selection.nom}</h3>
+                <p className="text-[13px] text-[#6B6B6B]">Promotion {selection.promotion} · {selection.ville}</p>
+              </div>
             </div>
-            <button onClick={() => setSelection(null)} className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm">Fermer</button>
+            <div className="flex gap-2 flex-wrap mb-6">
+              <span className="text-[11px] text-[#B5966E] font-semibold uppercase tracking-wide border border-[#B5966E] px-2.5 py-1">{selection.filiere}</span>
+              {selection.secteur && <span className="text-[11px] text-[#6B6B6B] border border-[#D5C9B8] px-2.5 py-1">{selection.secteur}</span>}
+            </div>
+            <button onClick={() => setSelection(null)}
+              className="w-full bg-[#1E5A8E] text-white font-medium py-3 text-[14px]">
+              Fermer
+            </button>
           </div>
         </div>
       )}
 
+      {/* Formulaire d'inscription */}
       {formulaire && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-30 p-6" onClick={() => setFormulaire(false)}>
-          <div className="bg-[#FAFAF8] rounded max-w-lg w-full p-8 border border-[#D5C9B8] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-serif text-2xl text-[#1E5A8E] mb-2">M&apos;inscrire dans l&apos;annuaire</h3>
-            <p className="text-[13.5px] text-[#6B6B6B] mb-6">Vos informations seront visibles par les membres de CANEL-LCBK.</p>
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-30 p-4 sm:p-6"
+          onClick={() => setFormulaire(false)}>
+          <div className="bg-white w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto border-t-4 border-[#B5966E]"
+            onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-serif text-[22px] text-[#1E5A8E] mb-2">M&apos;inscrire dans l&apos;annuaire</h3>
+            <p className="text-[13px] text-[#6B6B6B] mb-6">Visible par les membres après validation du bureau.</p>
             {envoi === "succes" ? (
-              <div>
-                <p className="text-green-600 font-medium mb-4">Inscription réussie ! Vous apparaissez maintenant dans l&apos;annuaire.</p>
-                <button onClick={() => setFormulaire(false)} className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm">Fermer</button>
+              <div className="text-center py-6">
+                <p className="text-green-600 font-medium mb-4">✓ Inscription soumise — le bureau validera prochainement.</p>
+                <button onClick={() => setFormulaire(false)} className="bg-[#1E5A8E] text-white px-6 py-3 text-sm">Fermer</button>
               </div>
             ) : (
               <form onSubmit={inscrire} className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#1E5A8E] mb-1">Photo d&apos;identité (optionnelle)</label>
+                  <label className="block text-[11px] font-semibold text-[#6B6B6B] tracking-[0.08em] uppercase mb-2">Photo (optionnelle)</label>
                   <div className="flex items-center gap-4">
                     {apercu ? (
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#B5966E]">
-                        <Image src={apercu} alt="Aperçu" width={64} height={64} className="object-cover w-full h-full" />
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#B5966E]">
+                        <Image src={apercu} alt="Aperçu" width={56} height={56} className="object-cover w-full h-full" />
                       </div>
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-[#F0EAE0] border-2 border-dashed border-[#D5C9B8] flex items-center justify-center text-[#9a9a9a] text-xs text-center">Photo</div>
+                      <div className="w-14 h-14 rounded-full bg-[#F5F0E8] border-2 border-dashed border-[#D5C9B8] flex items-center justify-center text-[#9a9a9a] text-xs">Photo</div>
                     )}
-                    <label className="cursor-pointer bg-[#F0EAE0] border border-[#D5C9B8] text-sm px-4 py-2 rounded-sm hover:bg-white transition">
-                      Choisir une photo
+                    <label className="cursor-pointer bg-[#F5F0E8] border border-[#D5C9B8] text-sm px-4 py-2">
+                      Choisir
                       <input type="file" accept="image/*" className="hidden" onChange={choisirPhoto} />
                     </label>
                   </div>
                 </div>
                 {[
-                  { label: "Prénom", key: "prenom", placeholder: "Votre prénom" },
-                  { label: "Nom", key: "nom", placeholder: "Votre nom de famille" },
-                  { label: "Promotion (année)", key: "promotion", placeholder: "ex : 2018" },
-                  { label: "Filière suivie", key: "filiere", placeholder: "ex : Sciences, Littéraire, Économie" },
-                  { label: "Secteur d'activité actuel", key: "secteur", placeholder: "ex : Santé, Informatique, Éducation" },
-                  { label: "Ville actuelle", key: "ville", placeholder: "ex : N'Djamena, Sarh, Kyabé" },
+                  { label: "Prénom *", key: "prenom", placeholder: "Votre prénom", required: true },
+                  { label: "Nom *", key: "nom", placeholder: "Votre nom", required: true },
+                  { label: "Promotion (année) *", key: "promotion", placeholder: "ex : 2018", required: true },
+                  { label: "Filière *", key: "filiere", placeholder: "ex : Sciences, Littéraire", required: true },
+                  { label: "Secteur d'activité", key: "secteur", placeholder: "ex : Santé, Informatique", required: false },
+                  { label: "Ville actuelle", key: "ville", placeholder: "ex : N'Djamena, Kyabé", required: false },
                 ].map((f) => (
                   <div key={f.key}>
-                    <label className="block text-sm font-medium text-[#1E5A8E] mb-1">{f.label}</label>
-                    <input type="text" placeholder={f.placeholder} required
+                    <label className="block text-[11px] font-semibold text-[#6B6B6B] tracking-[0.08em] uppercase mb-2">{f.label}</label>
+                    <input type="text" placeholder={f.placeholder} required={f.required}
                       value={nouveau[f.key as keyof typeof nouveau]}
                       onChange={(e) => setNouveau({ ...nouveau, [f.key]: e.target.value })}
-                      className="w-full border border-[#D5C9B8] bg-white rounded-sm px-4 py-2.5 text-sm focus:outline-none focus:border-[#1E5A8E]" />
+                      className="w-full bg-[#F5F0E8] border border-[#D5C9B8] px-4 py-3 text-[15px] focus:outline-none focus:border-[#1E5A8E]" />
                   </div>
                 ))}
-                {envoi === "erreur" && <p className="text-red-600 text-sm">Une erreur s&apos;est produite. Vérifiez votre connexion et réessayez.</p>}
+                {envoi === "erreur" && <p className="text-red-600 text-sm">Une erreur s&apos;est produite. Réessayez.</p>}
                 <div className="flex gap-3 mt-2">
                   <button type="submit" disabled={envoi === "chargement"}
-                    className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm disabled:opacity-60">
-                    {envoi === "chargement" ? "Enregistrement..." : "S'inscrire"}
+                    className="bg-[#1E5A8E] text-white font-medium px-6 py-3 text-sm disabled:opacity-60 flex-1">
+                    {envoi === "chargement" ? "Envoi..." : "S'inscrire"}
                   </button>
-                  <button type="button" onClick={() => setFormulaire(false)} className="text-sm text-[#6B6B6B] px-4 py-2.5">Annuler</button>
+                  <button type="button" onClick={() => setFormulaire(false)}
+                    className="text-sm text-[#6B6B6B] px-4 py-3 border border-[#D5C9B8]">
+                    Annuler
+                  </button>
                 </div>
               </form>
             )}
@@ -321,5 +270,13 @@ export default function Annuaire() {
         </div>
       )}
     </>
+  );
+}
+
+export default function Annuaire() {
+  return (
+    <AuthGuard>
+      <ContenuAnnuaire />
+    </AuthGuard>
   );
 }
