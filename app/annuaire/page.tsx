@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "../lib/supabase";
 import { SkeletonCard } from "../components/Skeleton";
 import AuthGuard from "../components/AuthGuard";
@@ -25,11 +26,6 @@ function ContenuAnnuaire() {
   const [promo, setPromo] = useState("Toutes");
   const [secteur, setSecteur] = useState("Tous");
   const [selection, setSelection] = useState<Ancien | null>(null);
-  const [formulaire, setFormulaire] = useState(false);
-  const [nouveau, setNouveau] = useState({ nom: "", prenom: "", promotion: "", filiere: "", secteur: "", ville: "" });
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [apercu, setApercu] = useState<string | null>(null);
-  const [envoi, setEnvoi] = useState<"idle" | "chargement" | "succes" | "erreur">("idle");
 
   useEffect(() => { chargerAnciens(); }, []);
 
@@ -38,37 +34,6 @@ function ContenuAnnuaire() {
     const { data } = await supabase.from("anciens").select("*").eq("statut", "validé").order("promotion", { ascending: false });
     setAnciens(data || []);
     setChargement(false);
-  }
-
-  function choisirPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const fichier = e.target.files?.[0];
-    if (!fichier) return;
-    setPhoto(fichier);
-    setApercu(URL.createObjectURL(fichier));
-  }
-
-  async function inscrire(e: React.FormEvent) {
-    e.preventDefault();
-    setEnvoi("chargement");
-    let photo_url: string | null = null;
-    if (photo) {
-      const ext = photo.name.split(".").pop();
-      const nomFichier = `${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("photos").upload(nomFichier, photo, { contentType: photo.type });
-      if (!uploadError) {
-        const { data: urlData } = supabase.storage.from("photos").getPublicUrl(nomFichier);
-        photo_url = urlData.publicUrl;
-      }
-    }
-    const { error } = await supabase.from("anciens").insert([{ ...nouveau, photo_url }]);
-    if (error) { setEnvoi("erreur"); }
-    else {
-      setEnvoi("succes");
-      setNouveau({ nom: "", prenom: "", promotion: "", filiere: "", secteur: "", ville: "" });
-      setPhoto(null);
-      setApercu(null);
-      chargerAnciens();
-    }
   }
 
   const promotions = ["Toutes", ...Array.from(new Set(anciens.map((a) => a.promotion))).sort().reverse()];
@@ -111,10 +76,6 @@ function ContenuAnnuaire() {
               Retrouvez un ancien par promotion, filière ou secteur d&apos;activité.
             </p>
           </div>
-          <button onClick={() => { setFormulaire(true); setEnvoi("idle"); }}
-            className="bg-[#B5966E] text-white font-semibold text-sm px-6 py-3 whitespace-nowrap shrink-0">
-            + M&apos;inscrire
-          </button>
         </div>
       </section>
 
@@ -143,10 +104,10 @@ function ContenuAnnuaire() {
           ) : anciens.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-[#6B6B6B] mb-4">L&apos;annuaire est vide pour l&apos;instant.</p>
-              <button onClick={() => { setFormulaire(true); setEnvoi("idle"); }}
-                className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-3">
-                Être le premier à s&apos;inscrire
-              </button>
+              <Link href="/inscription"
+                className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-3 inline-block">
+                Créer un compte pour s&apos;inscrire
+              </Link>
             </div>
           ) : (
             <>
@@ -202,70 +163,6 @@ function ContenuAnnuaire() {
               className="w-full bg-[#1E5A8E] text-white font-medium py-3 text-[14px]">
               Fermer
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Formulaire d'inscription */}
-      {formulaire && (
-        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-30 p-4 sm:p-6"
-          onClick={() => setFormulaire(false)}>
-          <div className="bg-white w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto border-t-4 border-[#B5966E]"
-            onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-serif text-[22px] text-[#1E5A8E] mb-2">M&apos;inscrire dans l&apos;annuaire</h3>
-            <p className="text-[13px] text-[#6B6B6B] mb-6">Visible par les membres après validation du bureau.</p>
-            {envoi === "succes" ? (
-              <div className="text-center py-6">
-                <p className="text-green-600 font-medium mb-4">✓ Inscription soumise — le bureau validera prochainement.</p>
-                <button onClick={() => setFormulaire(false)} className="bg-[#1E5A8E] text-white px-6 py-3 text-sm">Fermer</button>
-              </div>
-            ) : (
-              <form onSubmit={inscrire} className="flex flex-col gap-4">
-                <div>
-                  <label className="block text-[11px] font-semibold text-[#6B6B6B] tracking-[0.08em] uppercase mb-2">Photo (optionnelle)</label>
-                  <div className="flex items-center gap-4">
-                    {apercu ? (
-                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-[#B5966E]">
-                        <Image src={apercu} alt="Aperçu" width={56} height={56} className="object-cover w-full h-full" />
-                      </div>
-                    ) : (
-                      <div className="w-14 h-14 rounded-full bg-[#F5F0E8] border-2 border-dashed border-[#D5C9B8] flex items-center justify-center text-[#9a9a9a] text-xs">Photo</div>
-                    )}
-                    <label className="cursor-pointer bg-[#F5F0E8] border border-[#D5C9B8] text-sm px-4 py-2">
-                      Choisir
-                      <input type="file" accept="image/*" className="hidden" onChange={choisirPhoto} />
-                    </label>
-                  </div>
-                </div>
-                {[
-                  { label: "Prénom *", key: "prenom", placeholder: "Votre prénom", required: true },
-                  { label: "Nom *", key: "nom", placeholder: "Votre nom", required: true },
-                  { label: "Promotion (année) *", key: "promotion", placeholder: "ex : 2018", required: true },
-                  { label: "Filière *", key: "filiere", placeholder: "ex : Sciences, Littéraire", required: true },
-                  { label: "Secteur d'activité", key: "secteur", placeholder: "ex : Santé, Informatique", required: false },
-                  { label: "Ville actuelle", key: "ville", placeholder: "ex : N'Djamena, Kyabé", required: false },
-                ].map((f) => (
-                  <div key={f.key}>
-                    <label className="block text-[11px] font-semibold text-[#6B6B6B] tracking-[0.08em] uppercase mb-2">{f.label}</label>
-                    <input type="text" placeholder={f.placeholder} required={f.required}
-                      value={nouveau[f.key as keyof typeof nouveau]}
-                      onChange={(e) => setNouveau({ ...nouveau, [f.key]: e.target.value })}
-                      className="w-full bg-[#F5F0E8] border border-[#D5C9B8] px-4 py-3 text-[15px] focus:outline-none focus:border-[#1E5A8E]" />
-                  </div>
-                ))}
-                {envoi === "erreur" && <p className="text-red-600 text-sm">Une erreur s&apos;est produite. Réessayez.</p>}
-                <div className="flex gap-3 mt-2">
-                  <button type="submit" disabled={envoi === "chargement"}
-                    className="bg-[#1E5A8E] text-white font-medium px-6 py-3 text-sm disabled:opacity-60 flex-1">
-                    {envoi === "chargement" ? "Envoi..." : "S'inscrire"}
-                  </button>
-                  <button type="button" onClick={() => setFormulaire(false)}
-                    className="text-sm text-[#6B6B6B] px-4 py-3 border border-[#D5C9B8]">
-                    Annuler
-                  </button>
-                </div>
-              </form>
-            )}
           </div>
         </div>
       )}
