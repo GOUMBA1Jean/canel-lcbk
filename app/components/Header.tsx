@@ -149,10 +149,10 @@ export default function Header() {
               <Link href="/connexion" className="text-sm font-medium text-[#1E5A8E] hover:underline">
                 Se connecter
               </Link>
-              <Link href="/inscription"
-                className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm hover:bg-[#2970AA] transition">
-                Rejoindre
-              </Link>
+             <Link href="/connexion"
+  className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-2.5 rounded-sm hover:bg-[#2970AA] transition">
+  Rejoindre
+</Link>
             </>
           )}
         </div>
@@ -226,10 +226,10 @@ export default function Header() {
                   className="border border-[#1E5A8E] text-[#1E5A8E] text-sm font-medium px-5 py-3.5 rounded-sm text-center min-h-[44px] flex items-center justify-center">
                   Se connecter
                 </Link>
-                <Link href="/inscription" onClick={() => setOuvert(false)}
-                  className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-3.5 rounded-sm text-center min-h-[44px] flex items-center justify-center">
-                  Rejoindre l&apos;annuaire
-                </Link>
+                <Link href="/connexion" onClick={() => setOuvert(false)}
+  className="bg-[#1E5A8E] text-white text-sm font-medium px-5 py-3.5 rounded-sm text-center min-h-[44px] flex items-center justify-center">
+  Rejoindre l&apos;annuaire
+</Link>
               </>
             )}
           </div>
