@@ -53,13 +53,17 @@ async function connecter(e: React.FormEvent) {
   e.preventDefault();
   setErreur("");
   
-  // Vérifier que c'est bien l'email admin
-  if (email !== ADMIN_EMAIL) {
+  const emailNettoye = email.trim().toLowerCase();
+  
+  if (emailNettoye !== ADMIN_EMAIL.trim().toLowerCase()) {
     setErreur("Accès non autorisé.");
     return;
   }
   
-  const { error } = await supabase.auth.signInWithPassword({ email, password: mdp });
+  const { error } = await supabase.auth.signInWithPassword({ 
+    email: emailNettoye, 
+    password: mdp 
+  });
   if (error) setErreur("Email ou mot de passe incorrect.");
 }
 
