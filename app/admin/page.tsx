@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
+const ADMIN_EMAIL = "admin@canel-lcbk.td"; // ← mettez votre email admin ici
 
 type Ancien = { id: string; prenom: string; nom: string; promotion: string; filiere: string; secteur: string; ville: string; statut: string; photo_url: string | null; };
 type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; statut: string; };
@@ -48,12 +49,19 @@ export default function Admin() {
 
   useEffect(() => { if (connecte) chargerTout(); }, [connecte]);
 
-  async function connecter(e: React.FormEvent) {
-    e.preventDefault();
-    setErreur("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password: mdp });
-    if (error) setErreur("Email ou mot de passe incorrect.");
+async function connecter(e: React.FormEvent) {
+  e.preventDefault();
+  setErreur("");
+  
+  // Vérifier que c'est bien l'email admin
+  if (email !== ADMIN_EMAIL) {
+    setErreur("Accès non autorisé.");
+    return;
   }
+  
+  const { error } = await supabase.auth.signInWithPassword({ email, password: mdp });
+  if (error) setErreur("Email ou mot de passe incorrect.");
+}
 
   async function deconnecter() {
     await supabase.auth.signOut();
