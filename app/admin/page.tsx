@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
-const ADMIN_EMAIL = "admin@canel-lcbk.td"; // ← mettez votre email admin ici
+const ADMIN_EMAIL = "canellcbk@gmail.com"; // ← mettez votre email admin ici
 
 type Ancien = { id: string; prenom: string; nom: string; promotion: string; filiere: string; secteur: string; ville: string; statut: string; photo_url: string | null; };
 type Actu = { id: string; titre: string; contenu: string; tag: string; auteur: string; statut: string; };
